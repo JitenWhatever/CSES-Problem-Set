@@ -56,7 +56,7 @@ int main(){
         int x = n/c;
         int y = n%c;
         int ans = pow(10, c-1) + x;
-        cout<<ans<<' '<<x<<' '<<y<<' '<<n<<' '<<c;
+        // cout<<ans<<' '<<x<<' '<<y<<' '<<n<<' '<<c;
         string s = to_string(ans);
         cout<<s[y]<<"\n";
     }
