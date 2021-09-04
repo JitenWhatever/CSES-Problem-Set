@@ -17,7 +17,7 @@ For each query, print the corresponding digit.
 
 Constraints
 1≤q≤1000
-1≤k≤1018
+1≤k≤10^18
 Example
 
 Input:
@@ -32,32 +32,61 @@ Output:
 1
 */
 
-
 #include<bits/stdc++.h>
 using namespace std;
 
-int pow(int x, unsigned int y){
-    int res=1;
+#define ll long long
+ll pow(ll x, unsigned ll y){
+    ll res=1;
     while(y>0){
-        if (y&1) res= (res*x); y=y>>1; x=(x*x);
+        if (y&1) {
+            res= (res*x); 
+            y=y>>1; 
+            x=(x*x);
+        }
     }
     return res;
 }
 
 int main(){
-    int t; cin>>t;
-    while(t--) {
-        int n; cin>>n;
-        int c = 1;
-        for (int p = 9;; n -= p, c++, p = 9*pow(10, c-1)*c) {
-            if (n - p <= 0) break;
+    ll q; cin>>q;
+    vector<ll> powerOfTen(19, 1); // limit is 10^18 // powers[i] => 10 power i
+    for (int power = 1; power <= 18; ++power) {
+        powerOfTen[power] = powerOfTen[power - 1] * 10;
+    }
+    while(q--) {
+        ll index; cin>>index;
+        ll digitsSoFar = 0, digitsBeforeActualBlock = 0;
+        int numberOfDigits;
+        for (int digits = 1; digits <= 18; ++digits) {
+            digitsSoFar += (powerOfTen[digits] - powerOfTen[digits - 1]) * digits;
+            if (digitsSoFar >= index) {
+                numberOfDigits = digits;
+                break;
+            }
+            digitsBeforeActualBlock += (powerOfTen[digits] - powerOfTen[digits - 1]) * digits;
         }
-        n--;
-        int x = n/c;
-        int y = n%c;
-        int ans = pow(10, c-1) + x;
-        // cout<<ans<<' '<<x<<' '<<y<<' '<<n<<' '<<c;
-        string s = to_string(ans);
-        cout<<s[y]<<"\n";
+
+        ll low = powerOfTen[numberOfDigits - 1];
+        ll high = powerOfTen[numberOfDigits] - 1;
+        ll bestValue = 0;
+        ll startingPositionOfBestValue;
+        while (low <= high) {
+           ll actualValue = (low + high)/2; 
+           ll startingPositionOfActualValue = digitsBeforeActualBlock + 1 + (actualValue - powerOfTen[numberOfDigits - 1])*numberOfDigits;
+
+           if (startingPositionOfActualValue <= index) {
+               if (actualValue > bestValue) {
+                   bestValue = actualValue;
+                   startingPositionOfBestValue = startingPositionOfActualValue;
+               }
+
+               low = actualValue + 1;
+           } else {
+               high = actualValue - 1;
+           }
+        }
+        string number = to_string(bestValue);
+        cout<<number[index - startingPositionOfBestValue]<<"\n";
     }
 }
